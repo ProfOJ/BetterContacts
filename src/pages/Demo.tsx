@@ -38,6 +38,7 @@ export function Demo() {
   const [activeTab, setActiveTab] = useState('contacts');
   const [satisfaction, setSatisfaction] = useState(0);
   const [feedback, setFeedback] = useState('');
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
   // Demo form state
   const [newContact, setNewContact] = useState({
@@ -131,31 +132,41 @@ export function Demo() {
   };
 
   const handleExitDemo = async () => {
+    setSubmittingFeedback(true);
+    
     try {
       const demoUser = JSON.parse(localStorage.getItem('demoUser') || '{}');
       
-      await supabase
+      // Save feedback to Supabase
+      const { error } = await supabase
         .from('demo_feedback')
         .insert([
           {
             name: demoUser.name || 'Anonymous',
             email: demoUser.email || '',
-            satisfaction_rating: satisfaction,
-            feedback_text: feedback
+            satisfaction_rating: satisfaction || null,
+            feedback_text: feedback || ''
           }
         ]);
+
+      if (error) {
+        console.error('Error saving feedback:', error);
+        // Still proceed with exit even if feedback save fails
+      }
     } catch (error) {
       console.error('Error saving feedback:', error);
+    } finally {
+      setSubmittingFeedback(false);
+      
+      // Clear demo data
+      localStorage.removeItem('demoUser');
+      localStorage.removeItem('demoContacts');
+      localStorage.removeItem('demoTags');
+      localStorage.removeItem('demoReminders');
+      
+      setDemoMode(false);
+      navigate('/');
     }
-
-    // Clear demo data
-    localStorage.removeItem('demoUser');
-    localStorage.removeItem('demoContacts');
-    localStorage.removeItem('demoTags');
-    localStorage.removeItem('demoReminders');
-    
-    setDemoMode(false);
-    navigate('/');
   };
 
   const upcomingReminders = reminders.filter(r => !r.completed).slice(0, 3);
@@ -611,15 +622,24 @@ export function Demo() {
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowExitModal(false)}
-                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                disabled={submittingFeedback}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors disabled:opacity-50"
               >
                 Continue Demo
               </button>
               <button
                 onClick={handleExitDemo}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                disabled={submittingFeedback}
+                className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
               >
-                Exit Demo
+                {submittingFeedback ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <span>Exit Demo</span>
+                )}
               </button>
             </div>
           </div>
