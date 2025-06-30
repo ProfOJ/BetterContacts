@@ -83,7 +83,23 @@ export function Landing() {
 
   return (
     <Layout showNav={false}>
-      <div className="bg-white dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-900 relative">
+        {/* Bolt.new Badge - Fixed Position */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <a
+            href="https://bolt.new/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block transform hover:scale-105 transition-transform duration-200 shadow-lg hover:shadow-xl"
+          >
+            <img
+              src="https://builton.top/bolt_logo_black_circle_360x360.png"
+              alt="Built on Bolt.new"
+              className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full border-2 border-white dark:border-gray-800 shadow-lg"
+            />
+          </a>
+        </div>
+
         {/* Navigation */}
         <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

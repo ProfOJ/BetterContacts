@@ -143,7 +143,7 @@ export function DemoSetup() {
                 Try Our Demo
               </h1>
               <p className="text-gray-600 dark:text-gray-400">
-                Experience the full power of intelligent contact management
+                Enter your name and email to try our demo (No account needed!)
               </p>
             </div>
 
